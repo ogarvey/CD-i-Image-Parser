@@ -37,16 +37,20 @@
       btnParsePalette = new Button();
       tableLayoutPanel3 = new TableLayoutPanel();
       tableLayoutPanel4 = new TableLayoutPanel();
-      paletteOffset = new NumericUpDown();
-      paletteLength = new NumericUpDown();
       grpPaletteType = new GroupBox();
       radIndexed = new RadioButton();
       radRgb = new RadioButton();
+      paletteLength = new NumericUpDown();
+      paletteOffset = new NumericUpDown();
+      label1 = new Label();
+      label2 = new Label();
       palettePicBox = new PictureBox();
       imagePicBox = new PictureBox();
       tableLayoutPanel5 = new TableLayoutPanel();
-      imageLength = new NumericUpDown();
-      imageOffset = new NumericUpDown();
+      label6 = new Label();
+      label5 = new Label();
+      imageWidth = new NumericUpDown();
+      imageHeight = new NumericUpDown();
       grpImageType = new GroupBox();
       radFont = new RadioButton();
       radRle3 = new RadioButton();
@@ -55,31 +59,27 @@
       radRle7 = new RadioButton();
       radDyuv = new RadioButton();
       tableLayoutPanel6 = new TableLayoutPanel();
-      imageHeight = new NumericUpDown();
-      imageWidth = new NumericUpDown();
-      openFileDialog1 = new OpenFileDialog();
-      label1 = new Label();
-      label2 = new Label();
-      label3 = new Label();
       label4 = new Label();
-      label5 = new Label();
-      label6 = new Label();
+      imageLength = new NumericUpDown();
+      imageOffset = new NumericUpDown();
+      label3 = new Label();
+      openFileDialog1 = new OpenFileDialog();
       tableLayoutPanel1.SuspendLayout();
       tableLayoutPanel2.SuspendLayout();
       tableLayoutPanel3.SuspendLayout();
       tableLayoutPanel4.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)paletteOffset).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)paletteLength).BeginInit();
       grpPaletteType.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)paletteLength).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)paletteOffset).BeginInit();
       ((System.ComponentModel.ISupportInitialize)palettePicBox).BeginInit();
       ((System.ComponentModel.ISupportInitialize)imagePicBox).BeginInit();
       tableLayoutPanel5.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)imageLength).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)imageOffset).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)imageWidth).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)imageHeight).BeginInit();
       grpImageType.SuspendLayout();
       tableLayoutPanel6.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)imageHeight).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)imageWidth).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)imageLength).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)imageOffset).BeginInit();
       SuspendLayout();
       // 
       // tableLayoutPanel1
@@ -221,24 +221,6 @@
       tableLayoutPanel4.Size = new Size(249, 227);
       tableLayoutPanel4.TabIndex = 0;
       // 
-      // paletteOffset
-      // 
-      paletteOffset.Location = new Point(2, 112);
-      paletteOffset.Margin = new Padding(2);
-      paletteOffset.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
-      paletteOffset.Name = "paletteOffset";
-      paletteOffset.Size = new Size(126, 23);
-      paletteOffset.TabIndex = 0;
-      // 
-      // paletteLength
-      // 
-      paletteLength.Location = new Point(2, 188);
-      paletteLength.Margin = new Padding(2);
-      paletteLength.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
-      paletteLength.Name = "paletteLength";
-      paletteLength.Size = new Size(126, 23);
-      paletteLength.TabIndex = 1;
-      // 
       // grpPaletteType
       // 
       grpPaletteType.Controls.Add(radIndexed);
@@ -276,6 +258,42 @@
       radRgb.TabStop = true;
       radRgb.Text = "RGB";
       radRgb.UseVisualStyleBackColor = true;
+      // 
+      // paletteLength
+      // 
+      paletteLength.Location = new Point(2, 188);
+      paletteLength.Margin = new Padding(2);
+      paletteLength.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+      paletteLength.Name = "paletteLength";
+      paletteLength.Size = new Size(126, 23);
+      paletteLength.TabIndex = 1;
+      // 
+      // paletteOffset
+      // 
+      paletteOffset.Location = new Point(2, 112);
+      paletteOffset.Margin = new Padding(2);
+      paletteOffset.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+      paletteOffset.Name = "paletteOffset";
+      paletteOffset.Size = new Size(126, 23);
+      paletteOffset.TabIndex = 0;
+      // 
+      // label1
+      // 
+      label1.AutoSize = true;
+      label1.Location = new Point(3, 72);
+      label1.Name = "label1";
+      label1.Size = new Size(78, 15);
+      label1.TabIndex = 3;
+      label1.Text = "Palette Offset";
+      // 
+      // label2
+      // 
+      label2.AutoSize = true;
+      label2.Location = new Point(3, 148);
+      label2.Name = "label2";
+      label2.Size = new Size(122, 15);
+      label2.TabIndex = 4;
+      label2.Text = "Palette Length (bytes)";
       // 
       // palettePicBox
       // 
@@ -326,24 +344,43 @@
       tableLayoutPanel5.Size = new Size(249, 690);
       tableLayoutPanel5.TabIndex = 3;
       // 
-      // imageLength
+      // label6
       // 
-      imageLength.Location = new Point(2, 22);
-      imageLength.Margin = new Padding(2);
-      imageLength.Maximum = new decimal(new int[] { 99999999, 0, 0, 0 });
-      imageLength.Name = "imageLength";
-      imageLength.Size = new Size(126, 23);
-      imageLength.TabIndex = 1;
-      imageLength.Value = new decimal(new int[] { 99999999, 0, 0, 0 });
+      label6.AutoSize = true;
+      label6.Location = new Point(3, 502);
+      label6.Name = "label6";
+      label6.Size = new Size(79, 15);
+      label6.TabIndex = 6;
+      label6.Text = "Image Height";
       // 
-      // imageOffset
+      // label5
       // 
-      imageOffset.Location = new Point(2, 185);
-      imageOffset.Margin = new Padding(2);
-      imageOffset.Maximum = new decimal(new int[] { 1410065407, 2, 0, 0 });
-      imageOffset.Name = "imageOffset";
-      imageOffset.Size = new Size(126, 23);
-      imageOffset.TabIndex = 0;
+      label5.AutoSize = true;
+      label5.Location = new Point(3, 320);
+      label5.Name = "label5";
+      label5.Size = new Size(75, 15);
+      label5.TabIndex = 5;
+      label5.Text = "Image Width";
+      // 
+      // imageWidth
+      // 
+      imageWidth.Location = new Point(2, 413);
+      imageWidth.Margin = new Padding(2);
+      imageWidth.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+      imageWidth.Name = "imageWidth";
+      imageWidth.Size = new Size(126, 23);
+      imageWidth.TabIndex = 0;
+      imageWidth.Value = new decimal(new int[] { 384, 0, 0, 0 });
+      // 
+      // imageHeight
+      // 
+      imageHeight.Location = new Point(2, 595);
+      imageHeight.Margin = new Padding(2);
+      imageHeight.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+      imageHeight.Name = "imageHeight";
+      imageHeight.Size = new Size(126, 23);
+      imageHeight.TabIndex = 1;
+      imageHeight.Value = new decimal(new int[] { 240, 0, 0, 0 });
       // 
       // grpImageType
       // 
@@ -452,47 +489,33 @@
       tableLayoutPanel6.Size = new Size(245, 41);
       tableLayoutPanel6.TabIndex = 3;
       // 
-      // imageHeight
+      // label4
       // 
-      imageHeight.Location = new Point(2, 595);
-      imageHeight.Margin = new Padding(2);
-      imageHeight.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-      imageHeight.Name = "imageHeight";
-      imageHeight.Size = new Size(126, 23);
-      imageHeight.TabIndex = 1;
-      imageHeight.Value = new decimal(new int[] { 240, 0, 0, 0 });
+      label4.AutoSize = true;
+      label4.Location = new Point(3, 0);
+      label4.Name = "label4";
+      label4.Size = new Size(119, 15);
+      label4.TabIndex = 5;
+      label4.Text = "Image Length (bytes)";
       // 
-      // imageWidth
+      // imageLength
       // 
-      imageWidth.Location = new Point(2, 413);
-      imageWidth.Margin = new Padding(2);
-      imageWidth.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-      imageWidth.Name = "imageWidth";
-      imageWidth.Size = new Size(126, 23);
-      imageWidth.TabIndex = 0;
-      imageWidth.Value = new decimal(new int[] { 384, 0, 0, 0 });
+      imageLength.Location = new Point(2, 22);
+      imageLength.Margin = new Padding(2);
+      imageLength.Maximum = new decimal(new int[] { 99999999, 0, 0, 0 });
+      imageLength.Name = "imageLength";
+      imageLength.Size = new Size(126, 23);
+      imageLength.TabIndex = 1;
+      imageLength.Value = new decimal(new int[] { 99999999, 0, 0, 0 });
       // 
-      // openFileDialog1
+      // imageOffset
       // 
-      openFileDialog1.FileName = "openFileDialog1";
-      // 
-      // label1
-      // 
-      label1.AutoSize = true;
-      label1.Location = new Point(3, 72);
-      label1.Name = "label1";
-      label1.Size = new Size(78, 15);
-      label1.TabIndex = 3;
-      label1.Text = "Palette Offset";
-      // 
-      // label2
-      // 
-      label2.AutoSize = true;
-      label2.Location = new Point(3, 148);
-      label2.Name = "label2";
-      label2.Size = new Size(122, 15);
-      label2.TabIndex = 4;
-      label2.Text = "Palette Length (bytes)";
+      imageOffset.Location = new Point(2, 185);
+      imageOffset.Margin = new Padding(2);
+      imageOffset.Maximum = new decimal(new int[] { 1410065407, 2, 0, 0 });
+      imageOffset.Name = "imageOffset";
+      imageOffset.Size = new Size(126, 23);
+      imageOffset.TabIndex = 0;
       // 
       // label3
       // 
@@ -503,32 +526,9 @@
       label3.TabIndex = 4;
       label3.Text = "Image Offset";
       // 
-      // label4
+      // openFileDialog1
       // 
-      label4.AutoSize = true;
-      label4.Location = new Point(3, 0);
-      label4.Name = "label4";
-      label4.Size = new Size(119, 15);
-      label4.TabIndex = 5;
-      label4.Text = "Image Length (bytes)";
-      // 
-      // label5
-      // 
-      label5.AutoSize = true;
-      label5.Location = new Point(3, 320);
-      label5.Name = "label5";
-      label5.Size = new Size(75, 15);
-      label5.TabIndex = 5;
-      label5.Text = "Image Width";
-      // 
-      // label6
-      // 
-      label6.AutoSize = true;
-      label6.Location = new Point(3, 502);
-      label6.Name = "label6";
-      label6.Size = new Size(79, 15);
-      label6.TabIndex = 6;
-      label6.Text = "Image Height";
+      openFileDialog1.FileName = "openFileDialog1";
       // 
       // Form1
       // 
@@ -544,22 +544,22 @@
       tableLayoutPanel3.ResumeLayout(false);
       tableLayoutPanel4.ResumeLayout(false);
       tableLayoutPanel4.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)paletteOffset).EndInit();
-      ((System.ComponentModel.ISupportInitialize)paletteLength).EndInit();
       grpPaletteType.ResumeLayout(false);
       grpPaletteType.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)paletteLength).EndInit();
+      ((System.ComponentModel.ISupportInitialize)paletteOffset).EndInit();
       ((System.ComponentModel.ISupportInitialize)palettePicBox).EndInit();
       ((System.ComponentModel.ISupportInitialize)imagePicBox).EndInit();
       tableLayoutPanel5.ResumeLayout(false);
       tableLayoutPanel5.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)imageLength).EndInit();
-      ((System.ComponentModel.ISupportInitialize)imageOffset).EndInit();
+      ((System.ComponentModel.ISupportInitialize)imageWidth).EndInit();
+      ((System.ComponentModel.ISupportInitialize)imageHeight).EndInit();
       grpImageType.ResumeLayout(false);
       grpImageType.PerformLayout();
       tableLayoutPanel6.ResumeLayout(false);
       tableLayoutPanel6.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)imageHeight).EndInit();
-      ((System.ComponentModel.ISupportInitialize)imageWidth).EndInit();
+      ((System.ComponentModel.ISupportInitialize)imageLength).EndInit();
+      ((System.ComponentModel.ISupportInitialize)imageOffset).EndInit();
       ResumeLayout(false);
     }
 
