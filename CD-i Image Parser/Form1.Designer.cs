@@ -30,22 +30,25 @@
     {
       tableLayoutPanel1 = new TableLayoutPanel();
       tableLayoutPanel2 = new TableLayoutPanel();
-      btnLoadPalette = new Button();
+      btnPaletteFolder = new Button();
       btnLoadImage = new Button();
       btnParseImage = new Button();
       btnParseGrayscale = new Button();
       btnParsePalette = new Button();
+      btnLoadPalette = new Button();
+      lstPalettes = new ComboBox();
+      chkUseTransparency = new CheckBox();
+      chkRLEGif = new CheckBox();
       tableLayoutPanel3 = new TableLayoutPanel();
       tableLayoutPanel4 = new TableLayoutPanel();
       grpPaletteType = new GroupBox();
+      radCLUT = new RadioButton();
       radIndexed = new RadioButton();
       radRgb = new RadioButton();
       paletteLength = new NumericUpDown();
       paletteOffset = new NumericUpDown();
       label1 = new Label();
       label2 = new Label();
-      palettePicBox = new PictureBox();
-      imagePicBox = new PictureBox();
       tableLayoutPanel5 = new TableLayoutPanel();
       label6 = new Label();
       label5 = new Label();
@@ -63,7 +66,11 @@
       imageLength = new NumericUpDown();
       imageOffset = new NumericUpDown();
       label3 = new Label();
+      palettePicBox = new PictureBox();
+      panel1 = new Panel();
+      imagePicBox = new PictureBox();
       openFileDialog1 = new OpenFileDialog();
+      folderBrowserDialog1 = new FolderBrowserDialog();
       tableLayoutPanel1.SuspendLayout();
       tableLayoutPanel2.SuspendLayout();
       tableLayoutPanel3.SuspendLayout();
@@ -71,8 +78,6 @@
       grpPaletteType.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)paletteLength).BeginInit();
       ((System.ComponentModel.ISupportInitialize)paletteOffset).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)palettePicBox).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)imagePicBox).BeginInit();
       tableLayoutPanel5.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)imageWidth).BeginInit();
       ((System.ComponentModel.ISupportInitialize)imageHeight).BeginInit();
@@ -80,10 +85,15 @@
       tableLayoutPanel6.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)imageLength).BeginInit();
       ((System.ComponentModel.ISupportInitialize)imageOffset).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)palettePicBox).BeginInit();
+      panel1.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)imagePicBox).BeginInit();
       SuspendLayout();
       // 
       // tableLayoutPanel1
       // 
+      tableLayoutPanel1.AutoScroll = true;
+      tableLayoutPanel1.AutoSize = true;
       tableLayoutPanel1.ColumnCount = 1;
       tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
       tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 0, 0);
@@ -95,50 +105,56 @@
       tableLayoutPanel1.RowCount = 2;
       tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
       tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 90F));
-      tableLayoutPanel1.Size = new Size(1270, 1032);
+      tableLayoutPanel1.Size = new Size(1859, 1096);
       tableLayoutPanel1.TabIndex = 0;
       // 
       // tableLayoutPanel2
       // 
-      tableLayoutPanel2.ColumnCount = 5;
-      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20.000494F));
-      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 19.9999981F));
-      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20.0005035F));
-      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20.0005016F));
-      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 19.9985027F));
+      tableLayoutPanel2.ColumnCount = 6;
+      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.66667F));
+      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.6670761F));
+      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.6666641F));
+      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.6670856F));
+      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.6670856F));
+      tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.6654186F));
+      tableLayoutPanel2.Controls.Add(btnPaletteFolder, 1, 0);
+      tableLayoutPanel2.Controls.Add(btnLoadImage, 2, 0);
+      tableLayoutPanel2.Controls.Add(btnParseImage, 5, 0);
+      tableLayoutPanel2.Controls.Add(btnParseGrayscale, 4, 0);
+      tableLayoutPanel2.Controls.Add(btnParsePalette, 3, 0);
       tableLayoutPanel2.Controls.Add(btnLoadPalette, 0, 0);
-      tableLayoutPanel2.Controls.Add(btnLoadImage, 1, 0);
-      tableLayoutPanel2.Controls.Add(btnParseImage, 4, 0);
-      tableLayoutPanel2.Controls.Add(btnParseGrayscale, 3, 0);
-      tableLayoutPanel2.Controls.Add(btnParsePalette, 2, 0);
+      tableLayoutPanel2.Controls.Add(lstPalettes, 1, 1);
+      tableLayoutPanel2.Controls.Add(chkUseTransparency, 4, 1);
+      tableLayoutPanel2.Controls.Add(chkRLEGif, 5, 1);
       tableLayoutPanel2.Dock = DockStyle.Fill;
       tableLayoutPanel2.Location = new Point(2, 2);
       tableLayoutPanel2.Margin = new Padding(2);
       tableLayoutPanel2.Name = "tableLayoutPanel2";
-      tableLayoutPanel2.RowCount = 1;
-      tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-      tableLayoutPanel2.Size = new Size(1266, 99);
+      tableLayoutPanel2.RowCount = 2;
+      tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 66.6666641F));
+      tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+      tableLayoutPanel2.Size = new Size(1855, 105);
       tableLayoutPanel2.TabIndex = 0;
       // 
-      // btnLoadPalette
+      // btnPaletteFolder
       // 
-      btnLoadPalette.Dock = DockStyle.Fill;
-      btnLoadPalette.Location = new Point(2, 2);
-      btnLoadPalette.Margin = new Padding(2);
-      btnLoadPalette.Name = "btnLoadPalette";
-      btnLoadPalette.Size = new Size(249, 95);
-      btnLoadPalette.TabIndex = 0;
-      btnLoadPalette.Text = "Choose Palette File";
-      btnLoadPalette.UseVisualStyleBackColor = true;
-      btnLoadPalette.Click += btnLoadPalette_Click;
+      btnPaletteFolder.Dock = DockStyle.Fill;
+      btnPaletteFolder.Location = new Point(311, 2);
+      btnPaletteFolder.Margin = new Padding(2);
+      btnPaletteFolder.Name = "btnPaletteFolder";
+      btnPaletteFolder.Size = new Size(305, 65);
+      btnPaletteFolder.TabIndex = 5;
+      btnPaletteFolder.Text = "Choose Palette Folder";
+      btnPaletteFolder.UseVisualStyleBackColor = true;
+      btnPaletteFolder.Click += btnPaletteFolder_Click;
       // 
       // btnLoadImage
       // 
       btnLoadImage.Dock = DockStyle.Fill;
-      btnLoadImage.Location = new Point(255, 2);
+      btnLoadImage.Location = new Point(620, 2);
       btnLoadImage.Margin = new Padding(2);
       btnLoadImage.Name = "btnLoadImage";
-      btnLoadImage.Size = new Size(249, 95);
+      btnLoadImage.Size = new Size(305, 65);
       btnLoadImage.TabIndex = 1;
       btnLoadImage.Text = "Choose Image File";
       btnLoadImage.UseVisualStyleBackColor = true;
@@ -147,10 +163,10 @@
       // btnParseImage
       // 
       btnParseImage.Dock = DockStyle.Fill;
-      btnParseImage.Location = new Point(1014, 2);
+      btnParseImage.Location = new Point(1547, 2);
       btnParseImage.Margin = new Padding(2);
       btnParseImage.Name = "btnParseImage";
-      btnParseImage.Size = new Size(250, 95);
+      btnParseImage.Size = new Size(306, 65);
       btnParseImage.TabIndex = 3;
       btnParseImage.Text = "Parse Image (With Palette)";
       btnParseImage.UseVisualStyleBackColor = true;
@@ -159,10 +175,10 @@
       // btnParseGrayscale
       // 
       btnParseGrayscale.Dock = DockStyle.Fill;
-      btnParseGrayscale.Location = new Point(761, 2);
+      btnParseGrayscale.Location = new Point(1238, 2);
       btnParseGrayscale.Margin = new Padding(2);
       btnParseGrayscale.Name = "btnParseGrayscale";
-      btnParseGrayscale.Size = new Size(249, 95);
+      btnParseGrayscale.Size = new Size(305, 65);
       btnParseGrayscale.TabIndex = 2;
       btnParseGrayscale.Text = "Parse Image (Grayscale)";
       btnParseGrayscale.UseVisualStyleBackColor = true;
@@ -171,32 +187,77 @@
       // btnParsePalette
       // 
       btnParsePalette.Dock = DockStyle.Fill;
-      btnParsePalette.Location = new Point(508, 2);
+      btnParsePalette.Location = new Point(929, 2);
       btnParsePalette.Margin = new Padding(2);
       btnParsePalette.Name = "btnParsePalette";
-      btnParsePalette.Size = new Size(249, 95);
+      btnParsePalette.Size = new Size(305, 65);
       btnParsePalette.TabIndex = 4;
       btnParsePalette.Text = "Parse Palette";
       btnParsePalette.UseVisualStyleBackColor = true;
       btnParsePalette.Click += btnParsePalette_Click;
       // 
+      // btnLoadPalette
+      // 
+      btnLoadPalette.Dock = DockStyle.Fill;
+      btnLoadPalette.Location = new Point(2, 2);
+      btnLoadPalette.Margin = new Padding(2);
+      btnLoadPalette.Name = "btnLoadPalette";
+      btnLoadPalette.Size = new Size(305, 65);
+      btnLoadPalette.TabIndex = 0;
+      btnLoadPalette.Text = "Choose Palette File";
+      btnLoadPalette.UseVisualStyleBackColor = true;
+      btnLoadPalette.Click += btnLoadPalette_Click;
+      // 
+      // lstPalettes
+      // 
+      tableLayoutPanel2.SetColumnSpan(lstPalettes, 3);
+      lstPalettes.Dock = DockStyle.Fill;
+      lstPalettes.FormattingEnabled = true;
+      lstPalettes.Location = new Point(312, 72);
+      lstPalettes.Name = "lstPalettes";
+      lstPalettes.Size = new Size(921, 23);
+      lstPalettes.TabIndex = 6;
+      lstPalettes.SelectedIndexChanged += lstPalettes_SelectedIndexChanged;
+      // 
+      // chkUseTransparency
+      // 
+      chkUseTransparency.AutoSize = true;
+      chkUseTransparency.Location = new Point(1239, 72);
+      chkUseTransparency.Name = "chkUseTransparency";
+      chkUseTransparency.Size = new Size(100, 19);
+      chkUseTransparency.TabIndex = 7;
+      chkUseTransparency.Text = "Transparency?";
+      chkUseTransparency.UseVisualStyleBackColor = true;
+      // 
+      // chkRLEGif
+      // 
+      chkRLEGif.AutoSize = true;
+      chkRLEGif.Location = new Point(1548, 72);
+      chkRLEGif.Name = "chkRLEGif";
+      chkRLEGif.Size = new Size(68, 19);
+      chkRLEGif.TabIndex = 8;
+      chkRLEGif.Text = "RLE Gif?";
+      chkRLEGif.UseVisualStyleBackColor = true;
+      // 
       // tableLayoutPanel3
       // 
+      tableLayoutPanel3.AutoScroll = true;
+      tableLayoutPanel3.AutoSize = true;
       tableLayoutPanel3.ColumnCount = 2;
-      tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-      tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80F));
+      tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20.05391F));
+      tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 79.94609F));
       tableLayoutPanel3.Controls.Add(tableLayoutPanel4, 0, 0);
-      tableLayoutPanel3.Controls.Add(palettePicBox, 1, 0);
-      tableLayoutPanel3.Controls.Add(imagePicBox, 1, 1);
       tableLayoutPanel3.Controls.Add(tableLayoutPanel5, 0, 1);
+      tableLayoutPanel3.Controls.Add(palettePicBox, 1, 0);
+      tableLayoutPanel3.Controls.Add(panel1, 1, 1);
       tableLayoutPanel3.Dock = DockStyle.Fill;
-      tableLayoutPanel3.Location = new Point(2, 105);
+      tableLayoutPanel3.Location = new Point(2, 111);
       tableLayoutPanel3.Margin = new Padding(2);
       tableLayoutPanel3.Name = "tableLayoutPanel3";
       tableLayoutPanel3.RowCount = 2;
       tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
       tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 75F));
-      tableLayoutPanel3.Size = new Size(1266, 925);
+      tableLayoutPanel3.Size = new Size(1855, 983);
       tableLayoutPanel3.TabIndex = 1;
       // 
       // tableLayoutPanel4
@@ -218,11 +279,12 @@
       tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 17F));
       tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 17F));
       tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 17F));
-      tableLayoutPanel4.Size = new Size(249, 227);
+      tableLayoutPanel4.Size = new Size(368, 241);
       tableLayoutPanel4.TabIndex = 0;
       // 
       // grpPaletteType
       // 
+      grpPaletteType.Controls.Add(radCLUT);
       grpPaletteType.Controls.Add(radIndexed);
       grpPaletteType.Controls.Add(radRgb);
       grpPaletteType.Dock = DockStyle.Fill;
@@ -230,10 +292,21 @@
       grpPaletteType.Margin = new Padding(2);
       grpPaletteType.Name = "grpPaletteType";
       grpPaletteType.Padding = new Padding(2);
-      grpPaletteType.Size = new Size(245, 68);
+      grpPaletteType.Size = new Size(364, 73);
       grpPaletteType.TabIndex = 2;
       grpPaletteType.TabStop = false;
       grpPaletteType.Text = "Palette Type";
+      // 
+      // radCLUT
+      // 
+      radCLUT.AutoSize = true;
+      radCLUT.Location = new Point(90, 18);
+      radCLUT.Name = "radCLUT";
+      radCLUT.Size = new Size(87, 19);
+      radCLUT.TabIndex = 2;
+      radCLUT.TabStop = true;
+      radCLUT.Text = "CLUT Banks";
+      radCLUT.UseVisualStyleBackColor = true;
       // 
       // radIndexed
       // 
@@ -261,7 +334,7 @@
       // 
       // paletteLength
       // 
-      paletteLength.Location = new Point(2, 188);
+      paletteLength.Location = new Point(2, 199);
       paletteLength.Margin = new Padding(2);
       paletteLength.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
       paletteLength.Name = "paletteLength";
@@ -270,7 +343,7 @@
       // 
       // paletteOffset
       // 
-      paletteOffset.Location = new Point(2, 112);
+      paletteOffset.Location = new Point(2, 119);
       paletteOffset.Margin = new Padding(2);
       paletteOffset.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
       paletteOffset.Name = "paletteOffset";
@@ -280,7 +353,7 @@
       // label1
       // 
       label1.AutoSize = true;
-      label1.Location = new Point(3, 72);
+      label1.Location = new Point(3, 77);
       label1.Name = "label1";
       label1.Size = new Size(78, 15);
       label1.TabIndex = 3;
@@ -289,32 +362,11 @@
       // label2
       // 
       label2.AutoSize = true;
-      label2.Location = new Point(3, 148);
+      label2.Location = new Point(3, 157);
       label2.Name = "label2";
       label2.Size = new Size(122, 15);
       label2.TabIndex = 4;
       label2.Text = "Palette Length (bytes)";
-      // 
-      // palettePicBox
-      // 
-      palettePicBox.Dock = DockStyle.Fill;
-      palettePicBox.Location = new Point(255, 2);
-      palettePicBox.Margin = new Padding(2);
-      palettePicBox.Name = "palettePicBox";
-      palettePicBox.Size = new Size(1009, 227);
-      palettePicBox.TabIndex = 1;
-      palettePicBox.TabStop = false;
-      // 
-      // imagePicBox
-      // 
-      imagePicBox.Dock = DockStyle.Fill;
-      imagePicBox.Location = new Point(255, 233);
-      imagePicBox.Margin = new Padding(2);
-      imagePicBox.Name = "imagePicBox";
-      imagePicBox.Size = new Size(1009, 690);
-      imagePicBox.TabIndex = 2;
-      imagePicBox.TabStop = false;
-      imagePicBox.Click += imagePicBox_Click;
       // 
       // tableLayoutPanel5
       // 
@@ -329,7 +381,7 @@
       tableLayoutPanel5.Controls.Add(imageOffset, 0, 2);
       tableLayoutPanel5.Controls.Add(label3, 0, 1);
       tableLayoutPanel5.Dock = DockStyle.Fill;
-      tableLayoutPanel5.Location = new Point(2, 233);
+      tableLayoutPanel5.Location = new Point(2, 247);
       tableLayoutPanel5.Margin = new Padding(2);
       tableLayoutPanel5.Name = "tableLayoutPanel5";
       tableLayoutPanel5.RowCount = 8;
@@ -341,13 +393,13 @@
       tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 13.3330231F));
       tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 13.3330231F));
       tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 13.3330231F));
-      tableLayoutPanel5.Size = new Size(249, 690);
+      tableLayoutPanel5.Size = new Size(368, 734);
       tableLayoutPanel5.TabIndex = 3;
       // 
       // label6
       // 
       label6.AutoSize = true;
-      label6.Location = new Point(3, 502);
+      label6.Location = new Point(3, 533);
       label6.Name = "label6";
       label6.Size = new Size(79, 15);
       label6.TabIndex = 6;
@@ -356,7 +408,7 @@
       // label5
       // 
       label5.AutoSize = true;
-      label5.Location = new Point(3, 320);
+      label5.Location = new Point(3, 339);
       label5.Name = "label5";
       label5.Size = new Size(75, 15);
       label5.TabIndex = 5;
@@ -364,7 +416,7 @@
       // 
       // imageWidth
       // 
-      imageWidth.Location = new Point(2, 413);
+      imageWidth.Location = new Point(2, 438);
       imageWidth.Margin = new Padding(2);
       imageWidth.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
       imageWidth.Name = "imageWidth";
@@ -374,9 +426,9 @@
       // 
       // imageHeight
       // 
-      imageHeight.Location = new Point(2, 595);
+      imageHeight.Location = new Point(2, 632);
       imageHeight.Margin = new Padding(2);
-      imageHeight.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+      imageHeight.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
       imageHeight.Name = "imageHeight";
       imageHeight.Size = new Size(126, 23);
       imageHeight.TabIndex = 1;
@@ -395,7 +447,7 @@
       grpImageType.Margin = new Padding(2);
       grpImageType.Name = "grpImageType";
       grpImageType.Padding = new Padding(2);
-      grpImageType.Size = new Size(245, 133);
+      grpImageType.Size = new Size(364, 142);
       grpImageType.TabIndex = 2;
       grpImageType.TabStop = false;
       grpImageType.Text = "Image Type";
@@ -480,13 +532,13 @@
       tableLayoutPanel6.Controls.Add(label4, 0, 0);
       tableLayoutPanel6.Controls.Add(imageLength, 0, 1);
       tableLayoutPanel6.Dock = DockStyle.Fill;
-      tableLayoutPanel6.Location = new Point(2, 277);
+      tableLayoutPanel6.Location = new Point(2, 293);
       tableLayoutPanel6.Margin = new Padding(2);
       tableLayoutPanel6.Name = "tableLayoutPanel6";
       tableLayoutPanel6.RowCount = 2;
       tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
       tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-      tableLayoutPanel6.Size = new Size(245, 41);
+      tableLayoutPanel6.Size = new Size(364, 44);
       tableLayoutPanel6.TabIndex = 3;
       // 
       // label4
@@ -500,7 +552,7 @@
       // 
       // imageLength
       // 
-      imageLength.Location = new Point(2, 22);
+      imageLength.Location = new Point(2, 24);
       imageLength.Margin = new Padding(2);
       imageLength.Maximum = new decimal(new int[] { 99999999, 0, 0, 0 });
       imageLength.Name = "imageLength";
@@ -510,7 +562,7 @@
       // 
       // imageOffset
       // 
-      imageOffset.Location = new Point(2, 185);
+      imageOffset.Location = new Point(2, 196);
       imageOffset.Margin = new Padding(2);
       imageOffset.Maximum = new decimal(new int[] { 1410065407, 2, 0, 0 });
       imageOffset.Name = "imageOffset";
@@ -520,11 +572,43 @@
       // label3
       // 
       label3.AutoSize = true;
-      label3.Location = new Point(3, 137);
+      label3.Location = new Point(3, 146);
       label3.Name = "label3";
       label3.Size = new Size(75, 15);
       label3.TabIndex = 4;
       label3.Text = "Image Offset";
+      // 
+      // palettePicBox
+      // 
+      palettePicBox.Location = new Point(374, 2);
+      palettePicBox.Margin = new Padding(2);
+      palettePicBox.Name = "palettePicBox";
+      palettePicBox.Size = new Size(1009, 241);
+      palettePicBox.TabIndex = 1;
+      palettePicBox.TabStop = false;
+      // 
+      // panel1
+      // 
+      panel1.AutoScroll = true;
+      panel1.AutoSize = true;
+      panel1.Controls.Add(imagePicBox);
+      panel1.Dock = DockStyle.Fill;
+      panel1.Location = new Point(375, 248);
+      panel1.Name = "panel1";
+      panel1.Size = new Size(1477, 732);
+      panel1.TabIndex = 4;
+      // 
+      // imagePicBox
+      // 
+      imagePicBox.Anchor = AnchorStyles.Top;
+      imagePicBox.Location = new Point(0, 0);
+      imagePicBox.Margin = new Padding(2);
+      imagePicBox.Name = "imagePicBox";
+      imagePicBox.Size = new Size(1477, 732);
+      imagePicBox.SizeMode = PictureBoxSizeMode.AutoSize;
+      imagePicBox.TabIndex = 3;
+      imagePicBox.TabStop = false;
+      imagePicBox.Click += imagePicBox_Click;
       // 
       // openFileDialog1
       // 
@@ -534,22 +618,25 @@
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
-      ClientSize = new Size(1270, 1032);
+      AutoScroll = true;
+      AutoSize = true;
+      ClientSize = new Size(1859, 1096);
       Controls.Add(tableLayoutPanel1);
       Margin = new Padding(2);
       Name = "Form1";
       Text = "Form1";
       tableLayoutPanel1.ResumeLayout(false);
+      tableLayoutPanel1.PerformLayout();
       tableLayoutPanel2.ResumeLayout(false);
+      tableLayoutPanel2.PerformLayout();
       tableLayoutPanel3.ResumeLayout(false);
+      tableLayoutPanel3.PerformLayout();
       tableLayoutPanel4.ResumeLayout(false);
       tableLayoutPanel4.PerformLayout();
       grpPaletteType.ResumeLayout(false);
       grpPaletteType.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)paletteLength).EndInit();
       ((System.ComponentModel.ISupportInitialize)paletteOffset).EndInit();
-      ((System.ComponentModel.ISupportInitialize)palettePicBox).EndInit();
-      ((System.ComponentModel.ISupportInitialize)imagePicBox).EndInit();
       tableLayoutPanel5.ResumeLayout(false);
       tableLayoutPanel5.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)imageWidth).EndInit();
@@ -560,7 +647,12 @@
       tableLayoutPanel6.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)imageLength).EndInit();
       ((System.ComponentModel.ISupportInitialize)imageOffset).EndInit();
+      ((System.ComponentModel.ISupportInitialize)palettePicBox).EndInit();
+      panel1.ResumeLayout(false);
+      panel1.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)imagePicBox).EndInit();
       ResumeLayout(false);
+      PerformLayout();
     }
 
     #endregion
@@ -574,7 +666,6 @@
     private GroupBox grpPaletteType;
     private RadioButton radRgb;
     private PictureBox palettePicBox;
-    private PictureBox imagePicBox;
     private TableLayoutPanel tableLayoutPanel5;
     private NumericUpDown imageLength;
     private NumericUpDown imageOffset;
@@ -601,5 +692,13 @@
     private Label label5;
     private Label label4;
     private Label label3;
+    private RadioButton radCLUT;
+    private Button btnPaletteFolder;
+    private FolderBrowserDialog folderBrowserDialog1;
+    private ComboBox lstPalettes;
+    private Panel panel1;
+    private PictureBox imagePicBox;
+    private CheckBox chkUseTransparency;
+    private CheckBox chkRLEGif;
   }
 }

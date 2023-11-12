@@ -34,7 +34,7 @@ namespace CD_i_Image_Parser.Helpers
       return source.Select((item, index) => (item, index));
     }
 
-    public static Bitmap CreateImage(byte[] imageBin, List<Color> colors, int Width, int Height)
+    public static Bitmap CreateImage(byte[] imageBin, List<Color> colors, int Width, int Height, bool useTransparency = false)
     {
       // convert each byte of imageBin to an int and use that as an index into the colors array to create a 384 pixel wide image
       var image = new Bitmap(Width, Height);
@@ -44,14 +44,20 @@ namespace CD_i_Image_Parser.Helpers
       var y = 0;
       var width = 1;
       var height = 1;
+      if (useTransparency)
+      {
+        colors[0] = Color.Transparent;
+      }
       foreach (var b in imageBin)
       {
         if (b >= colors.Count)
         {
-          MessageBox.Show("Palette does not contain enough colours");
-          return image;
+          brush.Color = colors[0];
         }
-        brush.Color = colors[b];
+        else
+        {
+          brush.Color = colors[b];
+        }
         graphics.FillRectangle(brush, x, y, width, height);
         x += width;
         if (x >= Width)

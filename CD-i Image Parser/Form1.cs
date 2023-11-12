@@ -12,6 +12,7 @@ namespace CD_i_Image_Parser
     private byte[] paletteBin;
     private byte[] imageBin;
     private List<Color> colors;
+    private List<string> paletteFiles;
 
     public Form1()
     {
@@ -69,25 +70,40 @@ namespace CD_i_Image_Parser
 
     private void btnParsePalette_Click(object sender, EventArgs e)
     {
-      var palBytes = paletteBin.Skip((int)paletteOffset.Value).Take((int)paletteLength.Value).ToArray();
+      ParsePalette();
+    }
+
+    private void ParsePalette()
+    {
       if (radRgb.Checked)
       {
+        var palBytes = paletteBin.Skip((int)paletteOffset.Value).Take((int)paletteLength.Value).ToArray();
         colors = ColorHelper.ConvertBytesToRGB(palBytes);
+      }
+      else if (radIndexed.Checked)
+      {
+        var palBytes = paletteBin.Skip((int)paletteOffset.Value).Take((int)paletteLength.Value).ToArray();
+        colors = ColorHelper.ReadPalette(palBytes);
+      }
+      else if (radCLUT.Checked)
+      {
+        var bankCount = (int)paletteLength.Value;
+        var bytesToTake = bankCount * 0x104;
+        var palBytes = paletteBin.Skip((int)paletteOffset.Value).Take(bytesToTake).ToArray();
+        colors = ColorHelper.ReadClutBankPalettes(palBytes, (byte)paletteLength.Value);
       }
       else
       {
-        colors = ColorHelper.ReadPalette(palBytes);
-        colors[0] = Color.Transparent;
+        MessageBox.Show("No Palette Type selected");
+        return;
       }
       var palBitmap = ColorHelper.CreateLabelledPalette(colors);
       palettePicBox.Image = palBitmap;
-      palettePicBox.Size = palettePicBox.Parent.Size;
-      palettePicBox.SizeMode = PictureBoxSizeMode.Zoom;
     }
 
     private void btnParseGrayscale_Click(object sender, EventArgs e)
     {
-      colors = ColorHelper.GenerateColors(256).ToList();
+      colors = ColorHelper.GenerateColors(128).ToList();
       var palBitmap = ColorHelper.CreateLabelledPalette(colors);
       palettePicBox.Image = palBitmap;
       palettePicBox.Size = palettePicBox.Parent.Size;
@@ -97,6 +113,17 @@ namespace CD_i_Image_Parser
 
     private void btnParseImage_Click(object sender, EventArgs e)
     {
+      ParseImage();
+
+    }
+
+    private void ParseImage()
+    {
+      if (colors.Count == 0)
+      {
+        MessageBox.Show("Palette not populated! Parse it and try again");
+        return;
+      }
       int width = (int)imageWidth.Value;
       int height = (int)imageHeight.Value;
       var image = new Bitmap(width, height);
@@ -134,11 +161,11 @@ namespace CD_i_Image_Parser
         default:
           break;
       }
-
+      panel1.AutoScroll = false;
+      panel1.Height = image.Height;
+      panel1.Width = image.Width;
       imagePicBox.Image = image;
-      imagePicBox.Size = imagePicBox.Parent.Size;
-      imagePicBox.SizeMode = PictureBoxSizeMode.Zoom;
-
+      panel1.AutoScroll = true;
     }
 
     private void pictureBox2_Click(object sender, EventArgs e)
@@ -150,7 +177,7 @@ namespace CD_i_Image_Parser
     {
       var outputDir = Path.GetDirectoryName(imageFilename);
       var outputFile = Path.GetFileNameWithoutExtension(imageFilename) + ".png";
-      var output = "";
+      string output;
       var imageType = Utilities.GetCheckedRadioButton(grpImageType).Name;
       switch (imageType)
       {
@@ -158,6 +185,24 @@ namespace CD_i_Image_Parser
           Directory.CreateDirectory(outputDir + @"/output/Rle7");
           output = Path.Combine(outputDir + @"/output/Rle7", outputFile);
           imagePicBox.Image.Save(output);
+          if (chkRLEGif.Checked)
+          {
+            var outputPath = Path.Combine(outputDir + @"/output/Rle7", "gif");
+            Directory.CreateDirectory(outputPath);
+            var outputFilePath = Path.Combine(outputPath, $"{outputFile}.gif");
+            var offset = (int)imageOffset.Value;
+            var length = (int)imageLength.Value;
+            var bytes = imageBin.Skip(offset).Take(length).ToArray();
+            var images = new List<Bitmap>();
+            ImageFormatHelper.Rle7_AllBytes(bytes, colors, 384, images);
+            using (var gifWriter = new GifWriter(outputFilePath, 100))
+            {
+              foreach (var image in images)
+              {
+                gifWriter.WriteFrame(image);
+              }
+            }
+          }
           break;
         case "radRle3":
           Directory.CreateDirectory(outputDir + @"/output/Rle3");
@@ -193,6 +238,34 @@ namespace CD_i_Image_Parser
     private void paletteLength_ValueChanged(object sender, EventArgs e)
     {
 
+    }
+
+    private void btnPaletteFolder_Click(object sender, EventArgs e)
+    {
+      folderBrowserDialog1 = new FolderBrowserDialog()
+      {
+        Description = "Select a folder to load the palettes from",
+        ShowNewFolderButton = false
+      };
+      if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+      {
+        var paletteDir = folderBrowserDialog1.SelectedPath;
+        paletteFiles = Directory.GetFiles(paletteDir, "*.bin").ToList();
+        paletteFiles = paletteFiles.OrderBy(f => Convert.ToInt32(f.Split('_').Last().Split('.').First())).ToList();
+        lstPalettes.Items.Clear();
+        lstPalettes.Items.AddRange(paletteFiles.ToArray());
+      }
+    }
+
+    private void lstPalettes_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      paletteFilename = (sender as ComboBox).SelectedItem.ToString();
+      if (!string.IsNullOrEmpty(paletteFilename))
+      {
+        paletteBin = File.ReadAllBytes(paletteFilename);
+        ParsePalette();
+        ParseImage();
+      }
     }
   }
 }

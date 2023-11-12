@@ -303,10 +303,10 @@ namespace CD_i_Image_Parser.Helpers
       return rleBitmap;
     }
 
-    public static Bitmap GenerateRle7Image(List<Color> palette, byte[] rl7Bytes, int width, int height)
+    public static Bitmap GenerateRle7Image(List<Color> palette, byte[] rl7Bytes, int width, int height, bool useTransparency = false)
     {
       var rleImage = Rle7(rl7Bytes, width, height);
-      var rleBitmap = CreateImage(rleImage, palette, width, height);
+      var rleBitmap = CreateImage(rleImage, palette, width, height, useTransparency);
       return rleBitmap;
     }
 
@@ -479,6 +479,92 @@ namespace CD_i_Image_Parser.Helpers
       }
 
       return (plteBytes, idatBytes);
+    }
+
+
+    public static void Rle7_AllBytes(byte[] dataRLE, List<Color> palette, int width, List<Bitmap> images)
+    {
+      //initialize variables
+      int nrRLEData = dataRLE.Count();
+      byte[] dataDecoded = new byte[0x16800];
+      int posX = 1;
+      int outputIndex = 0;
+      int inputIndex = 0;
+      int initialIndex;
+
+      //decode RLE7
+      while (inputIndex < nrRLEData)
+      {
+        initialIndex = inputIndex;
+        //get run count
+        byte byte1 = @dataRLE[inputIndex++];
+        if (inputIndex >= nrRLEData) { break; }
+        if (byte1 >= 128)
+        {
+          //draw multiple times
+          byte colorNr = (byte)(byte1 - 128);
+
+          //get runlength
+          byte rl = @dataRLE[inputIndex++];
+
+          //draw x times
+          for (int i = 0; i < rl; i++)
+          {
+            if (outputIndex >= dataDecoded.Length)
+            {
+              break;
+            }
+            var index = outputIndex++;
+            if (index >= dataDecoded.Length)
+            {
+              break;
+            }
+            dataDecoded[index] = @colorNr;
+            posX++;
+          }
+
+          //draw until end of line
+          if (rl == 0)
+          {
+            while (posX <= width)
+            {
+              if (outputIndex >= dataDecoded.Length)
+              {
+                break;
+              }
+              dataDecoded[outputIndex++] = @colorNr;
+              posX++;
+            }
+          }
+        }
+        else
+        {
+          //draw once
+          dataDecoded[outputIndex++] = @byte1;
+          posX++;
+        }
+
+        //reset x to 1 if end of line is reached
+        if (posX >= width) { posX = 1; }
+        if (outputIndex >= 0x16800)
+        {
+          var offsets = $"{initialIndex:X8}_{inputIndex:X8}";
+          var image = GenerateRle7Image(palette, dataDecoded, width, outputIndex / width, true);
+          images.Add(image);
+          dataDecoded = new byte[0x16800];
+          outputIndex = 0;
+          posX = 1;
+        }
+      }
+      /* int requiredSize = dataDecoded.Length - 1;
+      while (dataDecoded[requiredSize] == 0x00)
+      {
+        requiredSize--;
+      }
+      byte[] dataDecoded2 = new byte[requiredSize + 1];
+      Array.Copy(dataDecoded, dataDecoded2, requiredSize + 1); */
+      //decode CLUT to bitmap
+      //return dataDecoded2;
     }
 
   }

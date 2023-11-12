@@ -234,6 +234,42 @@ namespace CD_i_Image_Parser.Helpers
       return colors;
     }
 
+    public static List<Color> ReadClutBankPalettes(byte[] data, byte count)
+    {
+      var length = 0x100;
+      List<Color> colors = new List<Color>();
+      for (int i = 4; i < 4 + length; i += 4)
+      {
+        var color = Color.FromArgb(255, data[i + 1], data[i + 2], data[i + 3]);
+        colors.Add(color);
+      }
+      if (count >= 2)
+      {
+        for (int i = 264; i < 264 + length; i += 4)
+        {
+          var color = Color.FromArgb(255, data[i + 1], data[i + 2], data[i + 3]);
+          colors.Add(color);
+        }
+      }
+      if (count >= 3)
+      {
+        for (int i = 524; i < 524 + length; i += 4)
+        {
+          var color = Color.FromArgb(255, data[i + 1], data[i + 2], data[i + 3]);
+          colors.Add(color);
+        }
+      }
+      if (count == 4)
+      {
+        for (int i = 784; i < 784 + length; i += 4)
+        {
+          var color = Color.FromArgb(255, data[i + 1], data[i + 2], data[i + 3]);
+          colors.Add(color);
+        }
+      }
+      return colors;
+    }
+
     public static Color[] GenerateGrayscalePalette(int numColors)
     {
       Color[] palette = new Color[numColors];
