@@ -90,7 +90,7 @@ namespace CD_i_Image_Parser
         var bankCount = (int)paletteLength.Value;
         var bytesToTake = bankCount * 0x104;
         var palBytes = paletteBin.Skip((int)paletteOffset.Value).Take(bytesToTake).ToArray();
-        colors = ColorHelper.ReadClutBankPalettes(palBytes, (byte)paletteLength.Value);
+        colors = ColorHelper.ReadClutBankPalettes(palBytes, (byte)bankCount);
       }
       else
       {
@@ -119,7 +119,7 @@ namespace CD_i_Image_Parser
 
     private void ParseImage()
     {
-      if (colors.Count == 0)
+      if (colors?.Count == 0)
       {
         MessageBox.Show("Palette not populated! Parse it and try again");
         return;
@@ -166,11 +166,6 @@ namespace CD_i_Image_Parser
       panel1.Width = image.Width;
       imagePicBox.Image = image;
       panel1.AutoScroll = true;
-    }
-
-    private void pictureBox2_Click(object sender, EventArgs e)
-    {
-
     }
 
     private void imagePicBox_Click(object sender, EventArgs e)
@@ -266,6 +261,15 @@ namespace CD_i_Image_Parser
         ParsePalette();
         ParseImage();
       }
+    }
+
+    private void palettePicBox_Click(object sender, EventArgs e)
+    {
+      var outputDir = Path.GetDirectoryName(paletteFilename);
+      var outputFile = Path.GetFileNameWithoutExtension(paletteFilename) + "_palette.png";
+      string output;
+      output = Path.Combine(outputDir, outputFile);
+      palettePicBox.Image.Save(output);
     }
   }
 }

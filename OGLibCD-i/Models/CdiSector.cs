@@ -10,7 +10,6 @@ namespace OGLibCDi.Models
 {
   public class CdiSector
   {
-    private const short SECTOR_SIZE = 2352;
     private const byte HEADER_SIZE = 16;
     private const short SUB_HEADER_DATA_SIZE = 4;
     
@@ -20,42 +19,51 @@ namespace OGLibCDi.Models
 
     private byte[] _subHeaderData; // 4 bytes, technically but that's only because the 4 bytes are duplicated
     private byte[] _sectorData; // 2352 bytes
+    private byte _sectorType;
 
+    public int SectorIndex { get; private set; }
+    public int FileNumber { get => _subHeaderData[(int)SubHeaderByte.FileNumber]; }
+    public int Channel { get => _subHeaderData[(int)SubHeaderByte.ChannelNumber]; }
 
     public CodingInfo Coding { get; private set; }
-    public CdiSectorType SectorType { get; private set; }
+    public SubModeInfo SubMode { get; private set; }
 
-    public CdiSector(byte[] sectorData)
+    public string SectorTypeString { get => GetSectorType().ToString(); }
+
+    public CdiSector(byte[] sectorData, int sectorIndex) 
     {
+      SectorIndex = sectorIndex;
       _sectorData = sectorData;
       _subHeaderData = _sectorData.Skip(HEADER_SIZE).Take(SUB_HEADER_DATA_SIZE).ToArray();
       Coding = new CodingInfo(_subHeaderData[(int)SubHeaderByte.CodingInfo]);
-      SectorType = GetSectorType();
+      SubMode = new SubModeInfo(_subHeaderData[(int)SubHeaderByte.Submode], _subHeaderData[(int)SubHeaderByte.ChannelNumber], _subHeaderData[(int)SubHeaderByte.CodingInfo]);
+      _sectorType = _subHeaderData[(int)SubHeaderByte.Submode] switch
+      {
+        var sub when (sub & (1 << 1)) != 0 => 0b00000010,
+        var sub when (sub & (1 << 2)) != 0 => 0b00000100,
+        var sub when (sub & (1 << 3)) != 0 => 0b00001000,
+        _ => 0b00000000
+      };
     }
 
-    private CdiSectorType GetSectorType()
+    public CdiSectorType GetSectorType()
     {
-      var subMode = _subHeaderData[(int)SubHeaderByte.Submode];
-      if (subMode.IsBitSet(1))
+      return _sectorType switch
       {
-        return CdiSectorType.Video;
-      } else if (subMode.IsBitSet(2))
-      {
-        return CdiSectorType.Audio;
-      } else if (subMode.IsBitSet(3))
-      {
-        return CdiSectorType.Data;
-      } else
-      {
-        return CdiSectorType.Empty;
-      }
+        0b00000010 => CdiSectorType.Video,
+        0b00000100 => CdiSectorType.Audio,
+        0b00001000 => CdiSectorType.Data,
+        _ => CdiSectorType.Empty
+      };
     }
 
-    public byte[] GetSectorData()
+    public byte[] GetSectorData(bool unparsed = false)
     {
       var bytes = _sectorData.Skip(HEADER_SIZE + (2 * SUB_HEADER_DATA_SIZE)).ToArray();
+
+      if (unparsed) return _sectorData;
       
-      switch(SectorType)
+      switch(GetSectorType())
       {
         case CdiSectorType.Audio:
           return bytes.Take(AUDIO_SECTOR_SIZE).ToArray();

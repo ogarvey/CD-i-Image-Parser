@@ -15,6 +15,27 @@ namespace OGLibCDi.Models
     public bool Emphasis => _byte.IsBitSet(6);
     public int BitsPerSample => (_byte >> 4) & 0x3;
     public int SampleRate => (_byte >> 2) & 0x3;
+    public string SampleRateString => SampleRate switch
+    {
+      0 => "37.8 kHz",
+      1 => "18.9 kHz",
+      _ => "Reserved"
+    };
+
+    public int SamplingFrequencyValue => SampleRate switch
+    {
+      0 => 37800,
+      1 => 18900,
+      _ => 0
+    };
+
+    public string BitsPerSampleString => BitsPerSample switch
+    {
+      0 => "4 bits",
+      1 => "8 bits",
+      _ => "Reserved"
+    };
+
     public bool IsStereo => (_byte & 0x03) == 1;
     public bool IsMono => (_byte & 0x03) == 0;
     #endregion

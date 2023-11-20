@@ -586,6 +586,7 @@
       palettePicBox.Size = new Size(1009, 241);
       palettePicBox.TabIndex = 1;
       palettePicBox.TabStop = false;
+      palettePicBox.Click += palettePicBox_Click;
       // 
       // panel1
       // 
