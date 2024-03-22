@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Color = System.Drawing.Color;
 using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace CD_i_Image_Parser.Helpers
@@ -52,7 +53,7 @@ namespace CD_i_Image_Parser.Helpers
       {
         if (b >= colors.Count)
         {
-          brush.Color = colors[0];
+          brush.Color = colors[b % colors.Count];
         }
         else
         {

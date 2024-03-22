@@ -1,7 +1,13 @@
 ﻿
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using static CD_i_Image_Parser.Helpers.Utilities;
+using Color = System.Drawing.Color;
+using Image = System.Drawing.Image;
+using Rectangle = System.Drawing.Rectangle;
+using SLImage = SixLabors.ImageSharp.Image;
 
 namespace CD_i_Image_Parser.Helpers
 {
@@ -255,12 +261,12 @@ namespace CD_i_Image_Parser.Helpers
           {
             var i = y * Width + x;
             var paletteIndex = clut7Bytes[i];
-            var color = paletteIndex < palette.Count ? palette[paletteIndex] : Color.Transparent;
+            var color = paletteIndex < palette.Count ? palette[paletteIndex] : palette[paletteIndex % palette.Count];
             clutImage.SetPixel(x, y, color);
           }
         }
       }
-      catch (System.Exception)
+      catch (System.Exception ex)
       {
         return clutImage;
       }
@@ -305,7 +311,7 @@ namespace CD_i_Image_Parser.Helpers
 
     public static Bitmap GenerateRle7Image(List<Color> palette, byte[] rl7Bytes, int width, int height, bool useTransparency = false)
     {
-      var rleImage = Rle7(rl7Bytes, width, height);
+      var rleImage = DecodeRle(rl7Bytes, width);
       var rleBitmap = CreateImage(rleImage, palette, width, height, useTransparency);
       return rleBitmap;
     }
@@ -377,6 +383,74 @@ namespace CD_i_Image_Parser.Helpers
 
       //decode CLUT to bitmap
       return dataDecoded;
+    }
+
+    public static byte[] DecodeRle(byte[] rleData, int lineWidth)
+    {
+      List<byte[]> lines = new List<byte[]>();
+      List<byte> currentLine = new List<byte>();
+
+      try
+      {
+
+        int i = 0;
+        while (i < rleData.Length)
+        {
+          byte firstByte = rleData[i];
+          bool isRun = (firstByte & 0x80) != 0; // Check if the MSB is set
+          byte colorIndex = (byte)(firstByte & 0x7F); // Extract color index (7 bits)
+
+          if (isRun)
+          {
+            if (i + 1 >= rleData.Length)
+            {
+              break;
+            }
+
+            byte runLength = rleData[i + 1];
+            i += 2;
+
+            if (runLength == 1)
+            {
+              continue;
+              //throw new Exception($"Invalid RLE data: Run length of 1 is forbidden at byte {i-1}");
+            }
+
+            int addLength = (runLength == 0) ? (lineWidth - currentLine.Count) : runLength;
+
+            if (currentLine.Count + addLength > lineWidth)
+            {
+              addLength = lineWidth - currentLine.Count;
+            }
+
+            currentLine.AddRange(Enumerable.Repeat(colorIndex, addLength));
+          }
+          else // Single pixel
+          {
+            currentLine.Add(colorIndex);
+            i++;
+          }
+
+          if (currentLine.Count == lineWidth)
+          {
+            lines.Add(currentLine.ToArray());
+            currentLine.Clear();
+          }
+        }
+
+        // Add the last line if not empty
+        if (currentLine.Count > 0)
+        {
+          lines.Add(currentLine.ToArray());
+        }
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show($"Error at line {lines.Count}, returning image so far: {ex}");
+        return lines.SelectMany(l => l).ToArray();
+      }
+
+      return lines.SelectMany(l =>l).ToArray();
     }
 
 
@@ -482,89 +556,75 @@ namespace CD_i_Image_Parser.Helpers
     }
 
 
-    public static void Rle7_AllBytes(byte[] dataRLE, List<Color> palette, int width, List<Bitmap> images)
+
+
+    public static void Rle7_AllBytes(byte[] dataRLE, List<Color> palette, int width, int heightPerImage, List<Image> images, bool useTransparency = false)
     {
-      //initialize variables
-      int nrRLEData = dataRLE.Count();
-      byte[] dataDecoded = new byte[0x16800];
-      int posX = 1;
-      int outputIndex = 0;
-      int inputIndex = 0;
-      int initialIndex;
-
-      //decode RLE7
-      while (inputIndex < nrRLEData)
+      var parsedRleData = DecodeRle(dataRLE, width);
+      for(int i = 0; i < parsedRleData.Length; i+=16800)
       {
-        initialIndex = inputIndex;
-        //get run count
-        byte byte1 = @dataRLE[inputIndex++];
-        if (inputIndex >= nrRLEData) { break; }
-        if (byte1 >= 128)
+        var rleImage = parsedRleData.Skip(i).Take(0x16800).ToArray();
+        var rleBitmap = CreateImage(rleImage, palette, width, heightPerImage, useTransparency);
+        images.Add(rleBitmap);
+      }
+    }
+    public static byte[] ImageToBytes(this Image img)
+    {
+      using (var stream = new MemoryStream())
+      {
+        img.Save(stream, ImageFormat.Png);
+        return stream.ToArray();
+      }
+    }
+
+    public static void CreateGifFromImageList(List<Image> images, string outputPath, int delay = 10, int repeat = 0, Image? backgroundFrame = null)
+    {
+      Image<Rgba32>? background = null;
+      if (backgroundFrame != null)
+      {
+        var bytes = backgroundFrame.ImageToBytes();
+        background = SLImage.Load<Rgba32>(bytes);
+      }
+
+      using SLImage gif = new SixLabors.ImageSharp.Image<Rgba32>(backgroundFrame?.Width ?? 384, backgroundFrame?.Height ?? 240);
+      var gifMetaData = gif.Metadata.GetGifMetadata();
+      gifMetaData.RepeatCount = (ushort)repeat;
+
+      GifFrameMetadata firstFrameMetadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
+      firstFrameMetadata.FrameDelay = delay;
+
+      // If the first frame is to be used as background, set its disposal method accordingly.
+      firstFrameMetadata.DisposalMethod = backgroundFrame != null ? GifDisposalMethod.NotDispose : GifDisposalMethod.RestoreToBackground;
+
+
+      foreach (var image in images)
+      {
+        var bytes = image.ImageToBytes();
+        using (SLImage frameImage = SLImage.Load<Rgba32>(bytes))
         {
-          //draw multiple times
-          byte colorNr = (byte)(byte1 - 128);
-
-          //get runlength
-          byte rl = @dataRLE[inputIndex++];
-
-          //draw x times
-          for (int i = 0; i < rl; i++)
+          // Create a new frame by compositing the current image over the background.
+          using (SLImage frame = new SixLabors.ImageSharp.Image<Rgba32>(backgroundFrame?.Width ?? 384, backgroundFrame?.Height ?? 240))
           {
-            if (outputIndex >= dataDecoded.Length)
+            if (background != null)
             {
-              break;
+              frame.Mutate(ctx => ctx.DrawImage(background, 1f));
             }
-            var index = outputIndex++;
-            if (index >= dataDecoded.Length)
-            {
-              break;
-            }
-            dataDecoded[index] = @colorNr;
-            posX++;
-          }
+            frame.Mutate(ctx => ctx.DrawImage(frameImage, 1f));
 
-          //draw until end of line
-          if (rl == 0)
-          {
-            while (posX <= width)
-            {
-              if (outputIndex >= dataDecoded.Length)
-              {
-                break;
-              }
-              dataDecoded[outputIndex++] = @colorNr;
-              posX++;
-            }
-          }
-        }
-        else
-        {
-          //draw once
-          dataDecoded[outputIndex++] = @byte1;
-          posX++;
-        }
+            // Set the delay and disposal method for each frame.
+            GifFrameMetadata frameMetadata = frame.Frames.RootFrame.Metadata.GetGifMetadata();
+            frameMetadata.FrameDelay = delay;
+            frameMetadata.DisposalMethod = GifDisposalMethod.RestoreToBackground;
 
-        //reset x to 1 if end of line is reached
-        if (posX >= width) { posX = 1; }
-        if (outputIndex >= 0x16800)
-        {
-          var offsets = $"{initialIndex:X8}_{inputIndex:X8}";
-          var image = GenerateRle7Image(palette, dataDecoded, width, outputIndex / width, true);
-          images.Add(image);
-          dataDecoded = new byte[0x16800];
-          outputIndex = 0;
-          posX = 1;
+            // Add the frame to the gif.
+            gif.Frames.AddFrame(frame.Frames.RootFrame);
+          }
         }
       }
-      /* int requiredSize = dataDecoded.Length - 1;
-      while (dataDecoded[requiredSize] == 0x00)
-      {
-        requiredSize--;
-      }
-      byte[] dataDecoded2 = new byte[requiredSize + 1];
-      Array.Copy(dataDecoded, dataDecoded2, requiredSize + 1); */
-      //decode CLUT to bitmap
-      //return dataDecoded2;
+
+      // Save the final result.
+      gif.SaveAsGif(outputPath);
+
     }
 
   }

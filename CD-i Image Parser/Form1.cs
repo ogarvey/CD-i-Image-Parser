@@ -1,4 +1,6 @@
 using CD_i_Image_Parser.Helpers;
+using Color = System.Drawing.Color;
+using Image = System.Drawing.Image;
 using System.Windows.Forms;
 
 namespace CD_i_Image_Parser
@@ -8,15 +10,56 @@ namespace CD_i_Image_Parser
     private bool isPaletteLoaded = false;
     private string paletteFilename;
     private string imageFilename;
+    private string paletteDir;
     private bool isImageLoaded = false;
     private byte[] paletteBin;
     private byte[] imageBin;
     private List<Color> colors;
     private List<string> paletteFiles;
+    private FileSystemWatcher watcher;
 
     public Form1()
     {
       InitializeComponent();
+      cmbProcessList.Items.AddRange(MemoryHelper.GetRunningProcesses().Select(p => p.ProcessName).ToArray());
+    }
+
+    private void InitializeFileSystemWatcher()
+    {
+      watcher = new FileSystemWatcher();
+      watcher.Path = paletteDir; // Specify the folder you want to watch
+      watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+      watcher.Filter = "*.bin*"; // Watch bin files
+
+      // Subscribe to events
+      watcher.Changed += OnChanged;
+      watcher.Created += OnChanged;
+      watcher.Deleted += OnChanged;
+      watcher.Renamed += OnChanged;
+
+      // Enable the watcher
+      watcher.EnableRaisingEvents = true;
+      UpdateMethod();
+    }
+
+    private void OnChanged(object sender, FileSystemEventArgs e)
+    {
+      UpdateMethod();
+    }
+
+    private void UpdateMethod()
+    {
+      if (lstPalettes.InvokeRequired)
+      {
+        lstPalettes.Invoke(new MethodInvoker(UpdateMethod));
+      }
+      else
+      {
+        paletteFiles = Directory.GetFiles(paletteDir, "*.bin").ToList();
+        paletteFiles = paletteFiles.OrderBy(f => f).ToList();
+        lstPalettes.Items.Clear();
+        lstPalettes.Items.AddRange(paletteFiles.ToArray());
+      }
     }
 
     private void btnLoadPalette_Click(object sender, EventArgs e)
@@ -38,7 +81,7 @@ namespace CD_i_Image_Parser
         catch (Exception)
         {
 
-          throw;
+          return;
         }
       }
     }
@@ -75,6 +118,7 @@ namespace CD_i_Image_Parser
 
     private void ParsePalette()
     {
+      if (paletteBin == null) return;
       if (radRgb.Checked)
       {
         var palBytes = paletteBin.Skip((int)paletteOffset.Value).Take((int)paletteLength.Value).ToArray();
@@ -124,6 +168,11 @@ namespace CD_i_Image_Parser
         MessageBox.Show("Palette not populated! Parse it and try again");
         return;
       }
+      if (imageBin == null || imageBin.Length == 0)
+      {
+        MessageBox.Show("Image not populated! Select it and try again");
+        return;
+      }
       int width = (int)imageWidth.Value;
       int height = (int)imageHeight.Value;
       var image = new Bitmap(width, height);
@@ -164,12 +213,14 @@ namespace CD_i_Image_Parser
       panel1.AutoScroll = false;
       panel1.Height = image.Height;
       panel1.Width = image.Width;
+      imagePicBox.Size = image.Size;
       imagePicBox.Image = image;
       panel1.AutoScroll = true;
     }
 
     private void imagePicBox_Click(object sender, EventArgs e)
     {
+      if (imagePicBox.Image == null) return;
       var outputDir = Path.GetDirectoryName(imageFilename);
       var outputFile = Path.GetFileNameWithoutExtension(imageFilename) + ".png";
       string output;
@@ -188,15 +239,15 @@ namespace CD_i_Image_Parser
             var offset = (int)imageOffset.Value;
             var length = (int)imageLength.Value;
             var bytes = imageBin.Skip(offset).Take(length).ToArray();
-            var images = new List<Bitmap>();
-            ImageFormatHelper.Rle7_AllBytes(bytes, colors, 384, images);
-            using (var gifWriter = new GifWriter(outputFilePath, 100))
+            var images = new List<Image>();
+            ImageFormatHelper.Rle7_AllBytes(bytes, colors, 384, (int)imageHeight.Value, images);
+            foreach (var (image, index) in images.WithIndex())
             {
-              foreach (var image in images)
-              {
-                gifWriter.WriteFrame(image);
-              }
+              var imageName = $"{outputFile}_{index}.png";
+              var imagePath = Path.Combine(outputPath, imageName);
+              image.Save(imagePath);
             }
+            ImageFormatHelper.CreateGifFromImageList(images, outputFilePath);
           }
           break;
         case "radRle3":
@@ -232,7 +283,7 @@ namespace CD_i_Image_Parser
 
     private void paletteLength_ValueChanged(object sender, EventArgs e)
     {
-
+      ParsePalette();
     }
 
     private void btnPaletteFolder_Click(object sender, EventArgs e)
@@ -244,11 +295,8 @@ namespace CD_i_Image_Parser
       };
       if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
       {
-        var paletteDir = folderBrowserDialog1.SelectedPath;
-        paletteFiles = Directory.GetFiles(paletteDir, "*.bin").ToList();
-        paletteFiles = paletteFiles.OrderBy(f => Convert.ToInt32(f.Split('_').Last().Split('.').First())).ToList();
-        lstPalettes.Items.Clear();
-        lstPalettes.Items.AddRange(paletteFiles.ToArray());
+        paletteDir = folderBrowserDialog1.SelectedPath;
+        InitializeFileSystemWatcher();
       }
     }
 
@@ -265,11 +313,31 @@ namespace CD_i_Image_Parser
 
     private void palettePicBox_Click(object sender, EventArgs e)
     {
-      var outputDir = Path.GetDirectoryName(paletteFilename);
+      if (palettePicBox.Image != null)
+      {
+        var outputDir = Path.GetDirectoryName(paletteFilename);
       var outputFile = Path.GetFileNameWithoutExtension(paletteFilename) + "_palette.png";
       string output;
       output = Path.Combine(outputDir, outputFile);
-      palettePicBox.Image.Save(output);
+       palettePicBox.Image.Save(output); 
+      }
+    }
+
+    private void btnGetCdiMem_Click(object sender, EventArgs e)
+    {
+      var cdiMem = MemoryHelper.GetCDiEmuMemory();
+      if (cdiMem.Length > 0)
+      {
+        File.WriteAllBytes(@"C:\Dev\Projects\Gaming\CD-i\CDiEmuMemoryDumps\cdiMem.bin", cdiMem);
+      }
+    }
+
+    private void imageProperty_ValueChanged(object sender, EventArgs e)
+    {
+      if(imageBin?.Length > 0)
+      {
+        ParseImage();
+      }
     }
   }
 }

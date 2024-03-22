@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Image = System.Drawing.Image;
 
 namespace CD_i_Image_Parser.Helpers
 {

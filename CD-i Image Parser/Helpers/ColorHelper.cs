@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
+using Color = System.Drawing.Color;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SizeF = System.Drawing.SizeF;
 
 namespace CD_i_Image_Parser.Helpers
 {
@@ -96,6 +98,18 @@ namespace CD_i_Image_Parser.Helpers
         Color color = Color.FromArgb(red, green, blue);
         colors.Add(color);
       }
+      //if (colors.Count < 128)
+      //{
+      //  // add random colors to fill the palette
+      //  var remaining = 128 - colors.Count;
+      //  for (int i = 0; i < remaining; i++)
+      //  {
+      //    // Add random colour
+      //    Random random = new Random();
+      //    Color color = Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
+      //    colors.Add(color);
+      //  }
+      //}
       return colors;
     }
 
